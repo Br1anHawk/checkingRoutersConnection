@@ -2,6 +2,7 @@ import com.sun.xml.internal.fastinfoset.util.StringArray
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.File
 import java.io.FileInputStream
+import javax.swing.table.DefaultTableModel
 
 class MainLogicSolution {
     private val mainHostsInfo: ArrayList<ArrayList<String>> = arrayListOf()
@@ -9,6 +10,13 @@ class MainLogicSolution {
     private var statusColumnNumber = -1
 
     private val connectionChecker = ConnectionChecker()
+
+    private var _tableModel: DefaultTableModel? = null
+    private val tableModel get() = _tableModel!!
+
+    fun setTableModel(tableModel: DefaultTableModel) {
+        _tableModel = tableModel
+    }
 
     fun getHostsInfo(): Array<Array<String>> {
         val arrayList = arrayListOf<Array<String>>()
@@ -48,6 +56,17 @@ class MainLogicSolution {
             mainHostsInfo.add(lineInfo)
             contentSheetLineNumberPosition++
         }
+        initTableModel(titleLineColumns)
+    }
+
+    private fun initTableModel(titleLineColumns: ArrayList<String>) {
+        titleLineColumns.forEach {
+            tableModel.addColumn(it)
+        }
+        tableModel.addColumn("Status")
+        mainHostsInfo.forEach {
+            tableModel.addRow(it.toArray())
+        }
     }
 
     fun checkAllHostsConnection() {
@@ -61,6 +80,16 @@ class MainLogicSolution {
         val routers = connectionChecker.getRouters()
         routers.forEach {
             updateRouterStatus(it)
+        }
+        updateTableModel()
+    }
+
+    private fun updateTableModel() {
+        while (tableModel.rowCount > 0) {
+            tableModel.removeRow(0)
+        }
+        mainHostsInfo.forEach {
+            tableModel.addRow(it.toArray())
         }
     }
 

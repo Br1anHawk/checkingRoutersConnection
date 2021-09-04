@@ -2,6 +2,7 @@ import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
+import javax.swing.table.DefaultTableModel
 import kotlin.collections.ArrayList
 
 class ConnectionChecker {

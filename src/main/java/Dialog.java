@@ -39,7 +39,6 @@ public class Dialog extends JDialog {
                 if (isFileSelectedInt == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     mainLogicSolution.loadInfo(selectedFile);
-                    updateTableModel();
                 }
             }
         });
@@ -48,16 +47,14 @@ public class Dialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainLogicSolution.checkAllHostsConnection();
-                updateTableModel();
             }
         });
     }
 
     private void initModelForJTable() {
         tableModel = new DefaultTableModel();
-        tableModel.addColumn("Hosts");
-        tableModel.addColumn("Status");
         tableMainHostsInfo.setModel(tableModel);
+        mainLogicSolution.setTableModel(tableModel);
     }
 
     private void updateTableModel() {
