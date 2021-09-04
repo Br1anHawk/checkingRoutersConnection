@@ -6,6 +6,7 @@ import java.io.FileInputStream
 class MainLogicSolution {
     private val mainHostsInfo: ArrayList<ArrayList<String>> = arrayListOf()
     private var hostColumnNumber = -1
+    private var statusColumnNumber = -1
 
     private val connectionChecker = ConnectionChecker()
 
@@ -43,6 +44,7 @@ class MainLogicSolution {
                 lineInfo.add(sheet.getRow(contentSheetLineNumberPosition).getCell(index).stringCellValue)
             }
             lineInfo.add("") //FOR STATUS INFO
+            statusColumnNumber = columnsCount
             mainHostsInfo.add(lineInfo)
             contentSheetLineNumberPosition++
         }
@@ -56,7 +58,18 @@ class MainLogicSolution {
         }
         connectionChecker.loadHosts(hosts)
         connectionChecker.checkAllHostsConnection()
+        val routers = connectionChecker.getRouters()
+        routers.forEach {
+            updateRouterStatus(it)
+        }
     }
+
+    private fun updateRouterStatus(router: Router) {
+        mainHostsInfo.find {
+            it[hostColumnNumber] == router.host
+        }?.set(statusColumnNumber, statusConverterToString(router.status))
+    }
+
 
     companion object {
         const val HOST_COLUMN_NAME = "host"

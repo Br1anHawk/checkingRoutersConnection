@@ -39,14 +39,7 @@ public class Dialog extends JDialog {
                 if (isFileSelectedInt == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     mainLogicSolution.loadInfo(selectedFile);
-                    String[][] mainHostsInfo = mainLogicSolution.getHostsInfo();
-                    for (String[] row : mainHostsInfo) {
-                        Object[] dataRowForTable = new Object[mainHostsInfo[0].length];
-                        for (int i = 0; i < row.length; i++) {
-                            dataRowForTable[i] = row[i];
-                        }
-                        tableModel.addRow(dataRowForTable);
-                    }
+                    updateTableModel();
                 }
             }
         });
@@ -55,6 +48,7 @@ public class Dialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainLogicSolution.checkAllHostsConnection();
+                updateTableModel();
             }
         });
     }
@@ -66,10 +60,25 @@ public class Dialog extends JDialog {
         tableMainHostsInfo.setModel(tableModel);
     }
 
+    private void updateTableModel() {
+        while(tableModel.getRowCount() > 0) {
+            tableModel.removeRow(0);
+        }
+        String[][] mainHostsInfo = mainLogicSolution.getHostsInfo();
+        for (String[] row : mainHostsInfo) {
+            Object[] dataRowForTable = new Object[mainHostsInfo[0].length];
+            for (int i = 0; i < row.length; i++) {
+                dataRowForTable[i] = row[i];
+            }
+            tableModel.addRow(dataRowForTable);
+        }
+    }
+
     public static void main(String[] args) {
         Dialog dialog = new Dialog();
         dialog.pack();
         dialog.setVisible(true);
+
         System.exit(0);
     }
 }

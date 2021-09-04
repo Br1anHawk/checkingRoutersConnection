@@ -7,6 +7,10 @@ import kotlin.collections.ArrayList
 class ConnectionChecker {
     private val routers: ArrayList<Router> = arrayListOf()
 
+    fun getRouters(): Array<Router> {
+        return routers.toTypedArray()
+    }
+
     fun loadHosts(hosts: ArrayList<String>) {
         hosts.forEach { routers.add(Router(it)) }
     }
