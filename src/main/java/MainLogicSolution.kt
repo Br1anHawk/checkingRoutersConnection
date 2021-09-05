@@ -47,6 +47,10 @@ class MainLogicSolution {
         return connectionChecker.getLastTimeCheckingDurationInMs()
     }
 
+    fun setOS(os: OperatingSystem) {
+        connectionChecker.os = os
+    }
+
     fun loadInfo(file: File) {
         val fileInputStream = FileInputStream(file)
         val workbook = WorkbookFactory.create(fileInputStream)

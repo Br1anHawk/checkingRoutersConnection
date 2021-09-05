@@ -12,6 +12,8 @@ class ConnectionChecker {
 
     private var lastTimeCheckingDurationInMs = 0L
 
+    var os = OperatingSystem.WINDOWS
+
     fun getLastTimeCheckingDurationInMs(): Long {
         return lastTimeCheckingDurationInMs
     }
@@ -60,7 +62,11 @@ class ConnectionChecker {
     private fun ping(router: Router) {
         val command = "ping"
         //val attributes = arrayOf("-n 1", "-l 1") //WINDOWS
-        val attributes = arrayOf("-c 1", "-s 32") //LINUX
+        //var attributes = arrayOf("-c 1", "-s 32") //LINUX
+        val attributes = when (os) {
+            OperatingSystem.WINDOWS -> arrayOf("-n 1", "-l 1")
+            OperatingSystem.LINUX -> arrayOf("-c 1", "-s 32")
+        }
         val processBuilder = ProcessBuilder(command, router.host, *attributes)
         val process = processBuilder.start()
         runBlocking {

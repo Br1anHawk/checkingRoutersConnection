@@ -22,6 +22,7 @@ public class Dialog extends JDialog {
     private JPanel panelSettings;
     private JButton buttonClearData;
     private JButton buttonSaveResult;
+    private JComboBox comboBoxOS;
 
     private JFileChooser fileChooser;
     private DefaultTableModel tableModel;
@@ -37,6 +38,9 @@ public class Dialog extends JDialog {
 
         panelOKCancelButtons.setVisible(false);
         initModelForJTable();
+
+        comboBoxOS.addItem(UtilsKt.OS_WINDOWS_NAME);
+        comboBoxOS.addItem(UtilsKt.OS_LINUX_NAME);
 
         textFieldSettingForPoolSize.setText(String.valueOf(DEFAULT_CHECKING_POOL_SIZE));
 
@@ -97,6 +101,20 @@ public class Dialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainLogicSolution.saveMainHostsInfoToFile();
+            }
+        });
+
+        comboBoxOS.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch (comboBoxOS.getSelectedItem().toString()) {
+                    case UtilsKt.OS_WINDOWS_NAME:
+                        mainLogicSolution.setOS(OperatingSystem.WINDOWS);
+                        break;
+                    case UtilsKt.OS_LINUX_NAME:
+                        mainLogicSolution.setOS(OperatingSystem.LINUX);
+                        break;
+                }
             }
         });
     }

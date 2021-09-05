@@ -9,3 +9,5 @@ fun statusConverterToString(status: RouterStatus): String {
 }
 
 const val DEFAULT_CHECKING_POOL_SIZE = 25
+const val OS_WINDOWS_NAME = "Windows"
+const val OS_LINUX_NAME = "Linux"
