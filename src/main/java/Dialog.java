@@ -20,6 +20,7 @@ public class Dialog extends JDialog {
     private JButton buttonSettings;
     private JTextField textFieldSettingForPoolSize;
     private JPanel panelSettings;
+    private JButton buttonClearData;
 
     private JFileChooser fileChooser;
     private DefaultTableModel tableModel;
@@ -48,6 +49,7 @@ public class Dialog extends JDialog {
                     File selectedFile = fileChooser.getSelectedFile();
                     mainLogicSolution.loadInfo(selectedFile);
                 }
+                buttonLoadHosts.setEnabled(false);
             }
         });
 
@@ -64,7 +66,7 @@ public class Dialog extends JDialog {
                     mainLogicSolution.setMaxPoolSizeRoutersConnection(poolSize);
                 }
                 progressBar.setValue(0);
-                AsyncTaskThread asyncTaskThread = new AsyncTaskThread(mainLogicSolution, labelDurationChecking);
+                AsyncTaskThread asyncTaskThread = new AsyncTaskThread(mainLogicSolution, labelDurationChecking, buttonCheckAllHostsConnection);
                 asyncTaskThread.start();
             }
         });
@@ -74,11 +76,19 @@ public class Dialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 if (panelSettings.isVisible()) {
                     panelSettings.setVisible(false);
-                    pack();
                 } else {
                     panelSettings.setVisible(true);
-                    pack();
                 }
+                pack();
+            }
+        });
+
+        buttonClearData.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainLogicSolution = new MainLogicSolution();
+                buttonLoadHosts.setEnabled(true);
+                initModelForJTable();
             }
         });
     }

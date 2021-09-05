@@ -95,6 +95,12 @@ class MainLogicSolution {
 
     fun checkAllHostsConnection() {
         if (hostColumnNumber == -1) return
+
+        mainHostsInfo.forEach {
+            it[statusColumnNumber] = statusConverterToString(RouterStatus.NONE)
+        }
+        updateTableModel()
+
         val hosts = arrayListOf<String>()
         mainHostsInfo.forEach {
             hosts.add(it[hostColumnNumber])
