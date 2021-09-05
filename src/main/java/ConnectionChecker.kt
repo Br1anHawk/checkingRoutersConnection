@@ -2,24 +2,34 @@ import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
-import javax.swing.table.DefaultTableModel
+import javax.swing.JProgressBar
 import kotlin.collections.ArrayList
 
 class ConnectionChecker {
     private val routers: ArrayList<Router> = arrayListOf()
+
+    var maxPoolSize = 25
+
+    private var lastTimeCheckingDurationInMs = 0L
+
+    fun getLastTimeCheckingDurationInMs(): Long {
+        return lastTimeCheckingDurationInMs
+    }
 
     fun getRouters(): Array<Router> {
         return routers.toTypedArray()
     }
 
     fun loadHosts(hosts: ArrayList<String>) {
+        routers.clear()
         hosts.forEach { routers.add(Router(it)) }
     }
 
-    fun checkAllHostsConnection() {
+    fun checkAllHostsConnection(progressBar: JProgressBar) {
         if (routers.isEmpty()) return
         val routersQueue: Queue<Router> = LinkedList()
         routers.forEach { routersQueue.add(it) }
+        val timeStartChecking = System.currentTimeMillis()
         while (routersQueue.isNotEmpty()) {
             val routersPool = getRoutersPool(routersQueue)
             runBlocking {
@@ -27,15 +37,18 @@ class ConnectionChecker {
                     val router = routersPool.poll()
                     launch {
                         ping(router)
+                        progressBar.value++
+                        println("PROGRESS BAR VALUE ----  " + progressBar.value)
                     }
                 }
             }
         }
+        val timeEndChecking = System.currentTimeMillis()
+        lastTimeCheckingDurationInMs = timeEndChecking - timeStartChecking
         printRoutersInfo() //ONLY FOR DEBUGGING
     }
 
     private fun getRoutersPool(routersQueue: Queue<Router>): Queue<Router> {
-        val maxPoolSize = 25;
         val routersPool: Queue<Router> = LinkedList()
         while(routersQueue.isNotEmpty()) {
             routersPool.add(routersQueue.poll())

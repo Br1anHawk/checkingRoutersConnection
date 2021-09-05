@@ -15,11 +15,18 @@ public class Dialog extends JDialog {
     private JTable tableMainHostsInfo;
     private JButton buttonLoadHosts;
     private JButton buttonCheckAllHostsConnection;
+    private JProgressBar progressBar;
+    private JLabel labelDurationChecking;
+    private JButton buttonSettings;
+    private JTextField textFieldSettingForPoolSize;
+    private JPanel panelSettings;
 
     private JFileChooser fileChooser;
     private DefaultTableModel tableModel;
 
     private MainLogicSolution mainLogicSolution = new MainLogicSolution();
+
+    private static final int DEFAULT_CHECKING_POOL_SIZE = 25;
 
     public Dialog() {
         setContentPane(contentPane);
@@ -29,6 +36,7 @@ public class Dialog extends JDialog {
         panelOKCancelButtons.setVisible(false);
         initModelForJTable();
 
+        textFieldSettingForPoolSize.setText(String.valueOf(DEFAULT_CHECKING_POOL_SIZE));
 
         buttonLoadHosts.addActionListener(new ActionListener() {
             @Override
@@ -46,7 +54,31 @@ public class Dialog extends JDialog {
         buttonCheckAllHostsConnection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainLogicSolution.checkAllHostsConnection();
+                //mainLogicSolution.checkAllHostsConnection();
+                int poolSize = DEFAULT_CHECKING_POOL_SIZE;
+                try {
+                    poolSize = Integer.parseInt(textFieldSettingForPoolSize.getText());
+                } catch (NumberFormatException exception) {
+                    exception.printStackTrace();
+                } finally {
+                    mainLogicSolution.setMaxPoolSizeRoutersConnection(poolSize);
+                }
+                progressBar.setValue(0);
+                AsyncTaskThread asyncTaskThread = new AsyncTaskThread(mainLogicSolution, labelDurationChecking);
+                asyncTaskThread.start();
+            }
+        });
+
+        buttonSettings.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (panelSettings.isVisible()) {
+                    panelSettings.setVisible(false);
+                    pack();
+                } else {
+                    panelSettings.setVisible(true);
+                    pack();
+                }
             }
         });
     }
@@ -55,6 +87,7 @@ public class Dialog extends JDialog {
         tableModel = new DefaultTableModel();
         tableMainHostsInfo.setModel(tableModel);
         mainLogicSolution.setTableModel(tableModel);
+        mainLogicSolution.setProgressBar(progressBar);
     }
 
     private void updateTableModel() {

@@ -2,6 +2,7 @@ import com.sun.xml.internal.fastinfoset.util.StringArray
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.File
 import java.io.FileInputStream
+import javax.swing.JProgressBar
 import javax.swing.table.DefaultTableModel
 
 class MainLogicSolution {
@@ -18,10 +19,29 @@ class MainLogicSolution {
         _tableModel = tableModel
     }
 
+    private var _progressBar: JProgressBar? = null
+    private val progressBar get() = _progressBar!!
+
+    fun setProgressBar(progressBar: JProgressBar) {
+        _progressBar = progressBar
+    }
+
     fun getHostsInfo(): Array<Array<String>> {
         val arrayList = arrayListOf<Array<String>>()
         mainHostsInfo.forEach { arrayList.add(it.toTypedArray()) }
         return arrayList.toTypedArray()
+    }
+
+    fun getMaxPoolSizeRoutersConnection(): Int {
+        return connectionChecker.maxPoolSize
+    }
+
+    fun setMaxPoolSizeRoutersConnection(poolSize: Int) {
+        connectionChecker.maxPoolSize = poolSize
+    }
+
+    fun getLastTimeCheckingDurationInMs(): Long {
+        return connectionChecker.getLastTimeCheckingDurationInMs()
     }
 
     fun loadInfo(file: File) {
@@ -57,6 +77,10 @@ class MainLogicSolution {
             contentSheetLineNumberPosition++
         }
         initTableModel(titleLineColumns)
+
+        progressBar.value = 0
+        progressBar.minimum = 0
+        progressBar.maximum = mainHostsInfo.size
     }
 
     private fun initTableModel(titleLineColumns: ArrayList<String>) {
@@ -76,7 +100,7 @@ class MainLogicSolution {
             hosts.add(it[hostColumnNumber])
         }
         connectionChecker.loadHosts(hosts)
-        connectionChecker.checkAllHostsConnection()
+        connectionChecker.checkAllHostsConnection(progressBar)
         val routers = connectionChecker.getRouters()
         routers.forEach {
             updateRouterStatus(it)
