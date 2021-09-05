@@ -21,13 +21,14 @@ public class Dialog extends JDialog {
     private JTextField textFieldSettingForPoolSize;
     private JPanel panelSettings;
     private JButton buttonClearData;
+    private JButton buttonSaveResult;
 
     private JFileChooser fileChooser;
     private DefaultTableModel tableModel;
 
     private MainLogicSolution mainLogicSolution = new MainLogicSolution();
 
-    private static final int DEFAULT_CHECKING_POOL_SIZE = 25;
+    private static final int DEFAULT_CHECKING_POOL_SIZE = UtilsKt.DEFAULT_CHECKING_POOL_SIZE;
 
     public Dialog() {
         setContentPane(contentPane);
@@ -48,8 +49,8 @@ public class Dialog extends JDialog {
                 if (isFileSelectedInt == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     mainLogicSolution.loadInfo(selectedFile);
+                    buttonLoadHosts.setEnabled(false);
                 }
-                buttonLoadHosts.setEnabled(false);
             }
         });
 
@@ -89,6 +90,13 @@ public class Dialog extends JDialog {
                 mainLogicSolution = new MainLogicSolution();
                 buttonLoadHosts.setEnabled(true);
                 initModelForJTable();
+            }
+        });
+
+        buttonSaveResult.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainLogicSolution.saveMainHostsInfoToFile();
             }
         });
     }

@@ -7,3 +7,5 @@ fun statusConverterToString(status: RouterStatus): String {
     }
     return statusInStringFormat
 }
+
+const val DEFAULT_CHECKING_POOL_SIZE = 25

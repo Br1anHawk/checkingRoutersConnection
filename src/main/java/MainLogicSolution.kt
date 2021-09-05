@@ -1,7 +1,10 @@
 import com.sun.xml.internal.fastinfoset.util.StringArray
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import javax.swing.JProgressBar
 import javax.swing.table.DefaultTableModel
 
@@ -69,7 +72,13 @@ class MainLogicSolution {
         while (sheet.getRow(contentSheetLineNumberPosition) != null) {
             val lineInfo: ArrayList<String> = arrayListOf()
             for (index in 0 until columnsCount) {
-                lineInfo.add(sheet.getRow(contentSheetLineNumberPosition).getCell(index).stringCellValue)
+                val cell = sheet.getRow(contentSheetLineNumberPosition).getCell(index)
+                var cellValue = ""
+                when (cell.cellType) {
+                    CellType.STRING -> cellValue = cell.stringCellValue
+                    CellType.NUMERIC -> cellValue = cell.numericCellValue.toInt().toString()
+                }
+                lineInfo.add(cellValue)
             }
             lineInfo.add("") //FOR STATUS INFO
             statusColumnNumber = columnsCount
@@ -114,6 +123,25 @@ class MainLogicSolution {
         updateTableModel()
     }
 
+    fun saveMainHostsInfoToFile() {
+        val workbook = XSSFWorkbook()
+        val sheet = workbook.createSheet()
+        val rowTitle = sheet.createRow(0)
+        for (index in 0 until tableModel.columnCount) {
+            rowTitle.createCell(index).setCellValue(tableModel.getColumnName(index))
+        }
+        for (indexI in mainHostsInfo.indices) {
+            val row = sheet.createRow(indexI + 1)
+            for (indexJ in mainHostsInfo[indexI].indices) {
+                row.createCell(indexJ).setCellValue(mainHostsInfo[indexI][indexJ])
+            }
+        }
+        val file = File(FILE_NAME_FOR_MAIN_HOSTS_INFO_SAVING)
+        val fileOutputStream = FileOutputStream(file)
+        workbook.write(fileOutputStream)
+        fileOutputStream.close()
+    }
+
     private fun updateTableModel() {
         while (tableModel.rowCount > 0) {
             tableModel.removeRow(0)
@@ -132,5 +160,6 @@ class MainLogicSolution {
 
     companion object {
         const val HOST_COLUMN_NAME = "host"
+        const val FILE_NAME_FOR_MAIN_HOSTS_INFO_SAVING = "routers_connection_info_result.xlsx"
     }
 }

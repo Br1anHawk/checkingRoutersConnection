@@ -8,7 +8,7 @@ import kotlin.collections.ArrayList
 class ConnectionChecker {
     private val routers: ArrayList<Router> = arrayListOf()
 
-    var maxPoolSize = 25
+    var maxPoolSize = DEFAULT_CHECKING_POOL_SIZE
 
     private var lastTimeCheckingDurationInMs = 0L
 
@@ -38,7 +38,7 @@ class ConnectionChecker {
                     launch {
                         ping(router)
                         progressBar.value++
-                        println("PROGRESS BAR VALUE ----  " + progressBar.value)
+                        //println("PROGRESS BAR VALUE ----  " + progressBar.value)
                     }
                 }
             }
