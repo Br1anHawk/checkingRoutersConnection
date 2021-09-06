@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="checkingRoutersConnection:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/checkingRoutersConnection_jar</output-path>
+    <root id="archive" name="checkingRoutersConnection.jar">
+      <element id="module-output" name="checkingRoutersConnection" />
+    </root>
+  </artifact>
+</component>

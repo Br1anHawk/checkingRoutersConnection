@@ -1,3 +1,5 @@
+package com.github.br1anhawk
+
 import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -60,14 +62,14 @@ class ConnectionChecker {
     }
 
     private fun ping(router: Router) {
-        val command = "ping"
+        val function = "ping"
         //val attributes = arrayOf("-n 1", "-l 1") //WINDOWS
         //var attributes = arrayOf("-c 1", "-s 32") //LINUX
-        val attributes = when (os) {
-            OperatingSystem.WINDOWS -> arrayOf("-n 1", "-l 1")
-            OperatingSystem.LINUX -> arrayOf("-c 1", "-s 32")
+        val command = when (os) {
+            OperatingSystem.WINDOWS -> arrayOf("cmd.exe", "/c", "chcp", "65001", "&", function, router.host, "-n", "1", "-l", "1")
+            OperatingSystem.LINUX -> arrayOf(function, router.host, "-c 1", "-s 32")
         }
-        val processBuilder = ProcessBuilder(command, router.host, *attributes)
+        val processBuilder = ProcessBuilder(*command)
         val process = processBuilder.start()
         runBlocking {
             launch {

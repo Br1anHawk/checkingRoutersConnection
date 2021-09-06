@@ -1,3 +1,5 @@
+package com.github.br1anhawk;
+
 import javax.swing.*;
 
 public class AsyncTaskThread extends Thread {
