@@ -3,6 +3,7 @@ package com.github.br1anhawk;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,6 +33,7 @@ public class Dialog extends JDialog {
     private static final int DEFAULT_CHECKING_POOL_SIZE = UtilsKt.DEFAULT_CHECKING_POOL_SIZE;
 
     public Dialog() {
+        super((Window) null);
         setContentPane(contentPane);
         setModal(true);
         setModalityType(ModalityType.TOOLKIT_MODAL);
