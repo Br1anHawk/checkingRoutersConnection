@@ -24,6 +24,8 @@ public class Dialog extends JDialog {
     private JButton buttonClearData;
     private JButton buttonSaveResult;
     private JComboBox comboBoxOS;
+    private JTextField textFieldCountOfAttempted;
+    private JCheckBox checkBoxLogging;
 
     private JFileChooser fileChooser;
     private DefaultTableModel tableModel;
@@ -39,6 +41,9 @@ public class Dialog extends JDialog {
         setModalityType(ModalityType.TOOLKIT_MODAL);
         getRootPane().setDefaultButton(buttonOK);
 
+        panelSettings.setVisible(false);
+        pack();
+
         panelOKCancelButtons.setVisible(false);
         initModelForJTable();
 
@@ -46,6 +51,8 @@ public class Dialog extends JDialog {
         comboBoxOS.addItem(UtilsKt.OS_LINUX_NAME);
 
         textFieldSettingForPoolSize.setText(String.valueOf(DEFAULT_CHECKING_POOL_SIZE));
+        textFieldCountOfAttempted.setText(String.valueOf(UtilsKt.DEFAULT_COUNT_OF_ATTEMPTED));
+        checkBoxLogging.setSelected(UtilsKt.LOGGING);
 
         buttonLoadHosts.addActionListener(new ActionListener() {
             @Override
@@ -66,16 +73,27 @@ public class Dialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 //mainLogicSolution.checkAllHostsConnection();
                 int poolSize = DEFAULT_CHECKING_POOL_SIZE;
+                int countOfAttempted = UtilsKt.DEFAULT_COUNT_OF_ATTEMPTED;
                 try {
                     poolSize = Integer.parseInt(textFieldSettingForPoolSize.getText());
+                    countOfAttempted = Integer.parseInt(textFieldCountOfAttempted.getText());
                 } catch (NumberFormatException exception) {
                     exception.printStackTrace();
                 } finally {
                     mainLogicSolution.setMaxPoolSizeRoutersConnection(poolSize);
+                    mainLogicSolution.setCountOfAttemptedRoutersConnection(countOfAttempted);
+                    mainLogicSolution.setLogging(checkBoxLogging.isSelected());
                 }
                 progressBar.setValue(0);
                 AsyncTaskThread asyncTaskThread = new AsyncTaskThread(mainLogicSolution, labelDurationChecking, buttonCheckAllHostsConnection);
-                asyncTaskThread.start();
+                try {
+                    asyncTaskThread.start();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                } finally {
+                    //asyncTaskThread.interrupt();
+                }
+
             }
         });
 

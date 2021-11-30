@@ -20,8 +20,13 @@ public class AsyncTaskThread extends Thread {
     @Override
     public void run() {
         buttonCheckAllHostsConnection.setEnabled(false);
-        mainLogicSolution.checkAllHostsConnection();
-        labelDurationChecking.setText("The duration of the audit was " + mainLogicSolution.getLastTimeCheckingDurationInMs() / 1000 + " seconds");
-        buttonCheckAllHostsConnection.setEnabled(true);
+        try {
+            mainLogicSolution.checkAllHostsConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            labelDurationChecking.setText("The duration of the audit was " + mainLogicSolution.getLastTimeCheckingDurationInMs() / 1000 + " seconds");
+            buttonCheckAllHostsConnection.setEnabled(true);
+        }
     }
 }

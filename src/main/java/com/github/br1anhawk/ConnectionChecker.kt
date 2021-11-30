@@ -1,6 +1,8 @@
 package com.github.br1anhawk
 
 import kotlinx.coroutines.*
+import org.apache.xpath.operations.Bool
+import sun.rmi.runtime.Log
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
@@ -11,6 +13,12 @@ class ConnectionChecker {
     private val routers: ArrayList<Router> = arrayListOf()
 
     var maxPoolSize = DEFAULT_CHECKING_POOL_SIZE
+    var countOfAttempted = DEFAULT_COUNT_OF_ATTEMPTED
+    var logging = Logging()
+
+    fun setLogging(logging: Boolean) {
+        this.logging.isLogging = logging
+    }
 
     private var lastTimeCheckingDurationInMs = 0L
 
@@ -37,19 +45,78 @@ class ConnectionChecker {
         while (routersQueue.isNotEmpty()) {
             val routersPool = getRoutersPool(routersQueue)
             runBlocking {
+                val jobs: MutableList<Job> = mutableListOf()
                 while (routersPool.isNotEmpty()) {
                     val router = routersPool.poll()
-                    launch {
+                    val job = launch {
                         ping(router)
                         progressBar.value++
-                        //println("PROGRESS BAR VALUE ----  " + progressBar.value)
+
+                        //println("PROGRESS BAR VALUE ----  " + progressBar.value) //DEBUGGING
+
                     }
+                    jobs.add(job)
+                    //println(jobs.size) //DEBUGGING
                 }
+                jobs.joinAll()
             }
         }
+
+//        val pbs: Queue<ProcessBuilder> = LinkedList()
+//        routers.forEach {
+//            pbs.add(ping(it))
+//        }
+//        runBlocking {
+//            var count = 0
+//            val jobs: MutableList<Job> = mutableListOf()
+//            while (pbs.isNotEmpty()) {
+//
+//                val job = launch {
+//                    val process = pbs.poll().start()
+//
+//                    runBlocking {
+//                        launch {
+//                            process.waitFor()
+//                            val reader = BufferedReader(InputStreamReader(process.inputStream))
+//                            val stringBuilder = StringBuilder()
+//                            var line: String?
+//                            while (reader.readLine().also { line = it } != null) {
+//                                stringBuilder.appendLine(line)
+//                            }
+//
+//                            //print(stringBuilder.toString()) //ONLY FOR DEBUGGING
+//                            logging.log(stringBuilder.toString())
+//
+//                            if (stringBuilder.contains(Regex("time="))) {
+//                                //router.status = RouterStatus.ONLINE
+//                            } else {
+//                                //router.status = RouterStatus.OFFLINE
+//                            }
+//                            progressBar.value++
+//                        }
+//                    }
+//
+//
+//
+//                }
+//                count++
+//                jobs.add(job)
+//                if (count >= maxPoolSize) {
+//                    //jobs.joinAll()
+//                    count = 0
+//                    jobs.clear()
+//                }
+//            }
+//        }
+
+
+
         val timeEndChecking = System.currentTimeMillis()
         lastTimeCheckingDurationInMs = timeEndChecking - timeStartChecking
-        printRoutersInfo() //ONLY FOR DEBUGGING
+
+        //printRoutersInfo() //ONLY FOR DEBUGGING
+        routers.forEach { logging.log(it.toString()) }
+
     }
 
     private fun getRoutersPool(routersQueue: Queue<Router>): Queue<Router> {
@@ -66,10 +133,14 @@ class ConnectionChecker {
         //val attributes = arrayOf("-n 1", "-l 1") //WINDOWS
         //var attributes = arrayOf("-c 1", "-s 32") //LINUX
         val command = when (os) {
-            OperatingSystem.WINDOWS -> arrayOf("cmd.exe", "/c", "chcp", "65001", "&", function, router.host, "-n", "1", "-l", "1")
+            OperatingSystem.WINDOWS -> arrayOf(
+                "cmd.exe", "/c", "chcp", "65001", "&",
+                function, router.host, "-n", countOfAttempted.toString(), "-l", "1"
+            )
             OperatingSystem.LINUX -> arrayOf(function, router.host, "-c 1", "-s 32")
         }
         val processBuilder = ProcessBuilder(*command)
+//        return processBuilder
         val process = processBuilder.start()
         runBlocking {
             launch {
@@ -82,8 +153,11 @@ class ConnectionChecker {
         while (reader.readLine().also { line = it } != null) {
             stringBuilder.appendLine(line)
         }
-        print(stringBuilder.toString()) //ONLY FOR DEBUGGING
-        if (stringBuilder.contains(Regex("="))) {
+
+        //print(stringBuilder.toString()) //ONLY FOR DEBUGGING
+        logging.log(stringBuilder.toString())
+
+        if (stringBuilder.contains(Regex("time="))) {
             router.status = RouterStatus.ONLINE
         } else {
             router.status = RouterStatus.OFFLINE

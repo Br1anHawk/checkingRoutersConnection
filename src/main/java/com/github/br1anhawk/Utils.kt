@@ -10,6 +10,9 @@ fun statusConverterToString(status: RouterStatus): String {
     return statusInStringFormat
 }
 
-const val DEFAULT_CHECKING_POOL_SIZE = 25
+const val DEFAULT_CHECKING_POOL_SIZE = 250
+const val DEFAULT_COUNT_OF_ATTEMPTED = 3
 const val OS_WINDOWS_NAME = "Windows"
 const val OS_LINUX_NAME = "Linux"
+const val LOGGING = true
+const val LOGGING_FILE_NAME = "logging.log"
